@@ -8,16 +8,19 @@ session_start();
 <body>
 <div id="my-timers">
 <?php
+	require_once 'connection.php';
 	print "<table>";
 	$login = $_SESSION['login'];
-	$db = new SQLite3("time.db");
-	$statement=$db->prepare("SELECT rowid from timers WHERE login=:login");
-	$statement->bindValue(":login", $login, SQLITE3_TEXT);
-	$result=$statement->execute();
-	while($row=$result->fetchArray()) {
-		print "
+	$url = "/add-timer.php?id=";
+	$link = new mysqli($hostname, $username, $passw, $database) or die("Ошибка " . mysqli_error($link));
+	$query= "SELECT id, description from timers WHERE login='$login'";
+	$result=$link->query($query);
+	while($row=mysqli_fetch_array($result)) {
+		$currenturl = $url;
+		$currenturl .=$row[0];
+	print "
 		<tr>
-		<td><a href='add-timer.php'>$row[0]</a></td>		
+		<td><a href='$currenturl'>$row[1]</a></td>
 		</tr>";
 	}
 	print "</table";
